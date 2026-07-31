@@ -1,0 +1,26 @@
+[
+  {
+    "name": "示例·模力工场×魔搭社区 AI 运营创作大赛",
+    "host": "魔搭社区 ModelScope",
+    "track": "AI 内容创作 / 运营",
+    "deadline": "2026-08-15",
+    "contest_date": "2026-08-20 ~ 2026-09-10",
+    "format": "线上",
+    "team": "团队最多 4 人",
+    "prize": "最高 10 万元 + 算力资源",
+    "requirement": "面向开发者与创作者，需报名审核",
+    "link": "https://example.com/contest/1"
+  },
+  {
+    "name": "示例·钱潮杯 AI+跨境出海全球创业大赛",
+    "host": "杭州市相关机构",
+    "track": "AI + 跨境出海",
+    "deadline": "2026-09-30",
+    "contest_date": "2026-10-15 ~ 2026-10-17",
+    "format": "线下（杭州）+ 线上路演",
+    "team": "团队",
+    "prize": "最高 50 万元 + 落地扶持",
+    "requirement": "初创团队，有可演示产品",
+    "link": "https://example.com/contest/2"
+  }
+]
