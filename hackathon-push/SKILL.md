@@ -23,21 +23,27 @@ agent_created: true
 - 「距今 X 天」用脚本的 `days_left()` 计算（基于 `datetime.date.today()`），不要估算。
 - 搜索 query 中的年份用占位符 `{YYYY}`，运行时替换为当前年份。
 
-## 第 0 步：交互确定推送频率（首次/缺失时）
+## 第 0 步：交互确定推送频率 + 引导配置 chat_id（首次/缺失时）
 
-若状态目录 `config.json` 未设置 `push_frequency`，**先用 AskUserQuestion 询问用户推送频率**（若 Agent 不支持则自然语言询问），三选一并写入：
+**频率交互（agent 无关）：** 若状态目录 `config.json` 未设置 `push_frequency`，用**所在 Agent 的提问能力**（如自然语言追问用户）询问推送频率，三选一并写入：
 
 - **每天**（daily）：每个工作日推送紧急+观察赛事，周五附前瞻简报。
 - **每周五**（weekly_fri）：仅在周五推送当周汇总（紧急+观察+前瞻）。
 - **仅手动**（manual）：不自动发消息，仅在用户主动说「推送」时发；多维表仍每次更新。
 
-写入命令：
+写入命令（拿到答案后执行）：
 
 ```bash
 python scripts/push_feishu.py --set-frequency daily      # 或 weekly_fri / manual
 ```
 
-频率存于 `config.json` 的 `push_frequency`，后续脚本自动据此决定是否发消息（多维表始终更新，不受频率限制）。
+**chat_id 引导（首次必做）：** 若 `chat_id` 未配置，脚本会打印获取方式与配置模板并退出。你应**先引导用户完成配置**再继续：
+
+- 告诉用户去飞书群「群设置 → 群机器人 / 群 ID」拿到 chat_id（形如 `oc_xxxx`）；
+- 让用户选一种方式配置：命令行 `--chat-id`、环境变量 `FEISHU_CHAT_ID`、或状态目录 `config.json` 写入 `{"chat_id":"oc_xxxx"}`；
+- 用 `python scripts/push_feishu.py --show-config` 确认已生效。
+
+频率与 chat_id 存于 `config.json`，后续脚本自动据此决定是否发消息（多维表始终更新，不受频率限制）。
 
 ## 第一步：高价值信源搜索
 

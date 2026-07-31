@@ -123,6 +123,24 @@ def resolve_chat_id(cli_override: str = None) -> str:
     return load_config().get("chat_id", "")
 
 
+def print_chat_id_help():
+    """chat_id 缺失时，打印获取方式与配置模板（替代冷冰冰的报错）。"""
+    print("\n" + "=" * 52)
+    print("未配置飞书群 chat_id，无法推送消息")
+    print("=" * 52)
+    print("如何获取 chat_id：")
+    print("  飞书客户端打开目标群 → 群设置 → 群机器人 / 群 ID")
+    print("  （形如 oc_xxxxxxxxxxxxxxxx，也可通过飞书开放平台 API 查询）")
+    print("\n配置方式（任选其一，优先级从高到低）：")
+    print("  1) 命令行   : python push_feishu.py --chat-id oc_xxxx ...")
+    print("  2) 环境变量 : export FEISHU_CHAT_ID=oc_xxxx")
+    print("  3) 配置文件 : 在状态目录 config.json 写入下例：")
+    print('       {"chat_id": "oc_xxxx"}')
+    print(f"\n状态目录：{STATE_DIR}")
+    print("配置后运行  python push_feishu.py --show-config  验证是否生效。")
+    print("=" * 52 + "\n")
+
+
 def show_config():
     cfg = load_config()
     print("当前生效配置：")
@@ -134,10 +152,7 @@ def show_config():
     print(f"  BITABLE_APP    : {'已设置' if cfg.get('bitable_app_token') else '未设置（跳过多维表）'}")
     print(f"  状态目录        : {STATE_DIR}")
     if not resolve_chat_id():
-        print("\n⚠️ 未配置 chat_id，请通过以下任一方式配置后再推送：")
-        print("  1) 命令行：--chat-id oc_xxxx")
-        print("  2) 环境变量：export FEISHU_CHAT_ID=oc_xxxx")
-        print(f"  3) 配置文件：{CONFIG_PATH} 写入 {{\"chat_id\": \"oc_xxxx\"}}")
+        print_chat_id_help()
     if not _cli_available() and not os.environ.get("FEISHU_APP_ID"):
         print("⚠️ lark-cli 不可用且未设置 FEISHU_APP_ID/SECRET，开放 API 回退将无法使用。")
 
@@ -395,12 +410,13 @@ def push_via_api(chat_id: str, chunks: list) -> bool:
 def push(chat_id: str, text: str, dry_run: bool = False) -> bool:
     chunks = chunk_text(text)
     if dry_run:
-        print(f"【DRY-RUN】将发送 {len(chunks)} 条消息到 chat_id={chat_id}：\n")
+        target = chat_id or "(预览模式，无需 chat_id)"
+        print(f"【DRY-RUN】将发送 {len(chunks)} 条消息到 {target}：\n")
         for i, part in enumerate(chunks, 1):
             print(f"──── 第 {i}/{len(chunks)} 条 ────\n{part}\n")
         return True
     if not chat_id:
-        print("❌ 未配置 chat_id，无法推送。用 --show-config 查看配置方式。")
+        print_chat_id_help()
         return False
     if _cli_available() and push_via_cli(chat_id, chunks):
         return True
