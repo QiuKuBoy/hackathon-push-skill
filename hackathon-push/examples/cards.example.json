@@ -9,7 +9,8 @@
     "team": "团队最多 4 人",
     "prize": "最高 10 万元 + 算力资源",
     "requirement": "面向开发者与创作者，需报名审核",
-    "link": "https://example.com/contest/1"
+    "link": "https://example.com/contest/1",
+    "category": "大厂"
   },
   {
     "name": "示例·钱潮杯 AI+跨境出海全球创业大赛",
@@ -21,6 +22,7 @@
     "team": "团队",
     "prize": "最高 50 万元 + 落地扶持",
     "requirement": "初创团队，有可演示产品",
-    "link": "https://example.com/contest/2"
+    "link": "https://example.com/contest/2",
+    "category": "政府/学会"
   }
 ]
