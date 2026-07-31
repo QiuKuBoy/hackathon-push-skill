@@ -12,6 +12,7 @@ push_feishu.py — 飞书赛事推送 + 多维表格同步（无第三方依赖�
 配置（优先级：命令行 --chat-id > 环境变量 > 状态目录 config.json）：
   - chat_id        : 飞书群 ID（消息推送目标）
   - push_frequency : daily（每天）/ weekly_fri（仅周五）/ manual（仅手动触发时推送消息）
+  - push_enabled   : 飞书消息推送总开关（默认 true；设为 false 则只更新库/多维表，绝不发消息）
   - bitable_app_token / bitable_table_id : 多维表格（可选）
   - daily_cap      : 单日消息最多推送几条赛事（默认 12）
   - FEISHU_APP_ID / FEISHU_APP_SECRET : lark-cli 不可用时开放 API 回退需要
@@ -34,6 +35,10 @@ push_feishu.py — 飞书赛事推送 + 多维表格同步（无第三方依赖�
 
     # 仅同步多维表 / 本地 CSV（不发消息）
     python push_feishu.py --json cards.json --sync-bitable
+
+    # 临时覆盖推送开关（无视 config.push_enabled）
+    python push_feishu.py --json cards.json --update-json --push     # 强制发
+    python push_feishu.py --json cards.json --update-json --no-push  # 只更新库
 
     # 查看当前生效配置
     python push_feishu.py --show-config
@@ -146,6 +151,7 @@ def show_config():
     print("当前生效配置：")
     print(f"  chat_id        : {resolve_chat_id() or '(空)'}")
     print(f"  push_frequency : {cfg.get('push_frequency', 'daily（默认）')}")
+    print(f"  push_enabled   : {cfg.get('push_enabled', True)}（true=发消息 / false=只更新库）")
     print(f"  daily_cap      : {cfg.get('daily_cap', 12)}")
     print(f"  lark-cli       : {'可用' if _cli_available() else '不可用（将回退开放 API）'}")
     print(f"  FEISHU_APP_ID  : {'已设置' if os.environ.get('FEISHU_APP_ID') else '未设置'}")
@@ -541,6 +547,8 @@ if __name__ == "__main__":
     ap.add_argument("--update-json", action="store_true", help="推送后写回去重记录（必须配合 --json）")
     ap.add_argument("--sync-bitable", action="store_true", help="仅同步多维表/本地CSV，不发送消息")
     ap.add_argument("--dry-run", action="store_true", help="仅预览，不实际发送")
+    ap.add_argument("--push", action="store_true", help="强制发送消息（无视 push_enabled=false 与频率闸门，临时覆盖）")
+    ap.add_argument("--no-push", action="store_true", help="本次只更新库/多维表、绝不发消息（无视 push_enabled=true，临时覆盖）")
     ap.add_argument("--show-config", action="store_true", help="显示当前配置后退出")
     ap.add_argument("--set-frequency", choices=["daily", "weekly_fri", "manual"],
                     help="设置推送频率并写入配置")
@@ -552,6 +560,14 @@ if __name__ == "__main__":
 
     chat_id = resolve_chat_id(args.chat_id)
     cfg = load_config()
+
+    # 本次是否发消息：--no-push > --push > 配置 push_enabled（默认 true）
+    if args.no_push:
+        effective_push = False
+    elif args.push:
+        effective_push = True
+    else:
+        effective_push = cfg.get("push_enabled", True)
 
     if args.set_frequency:
         cfg["push_frequency"] = args.set_frequency
@@ -589,19 +605,27 @@ if __name__ == "__main__":
     # ---- 消息推送 ----
     if args.text:
         # 草稿/临时：直接发文本，不写去重（避免误标）
+        if not effective_push:
+            print("ℹ️ 推送已禁用（push_enabled=false 或 --no-push），跳过消息发送。")
+            exit(0)
         ok = push(chat_id, args.text, dry_run=args.dry_run)
         exit(0 if ok else 1)
 
     # 结构化路径：先分类，再按频率闸门决定发哪些
-    msg_cards = decide_message_cards(cards, freq, cap)
+    # --push 时忽略频率闸门（用 daily 口径选择，手动想“现在就发一份摘要”）
+    selection_freq = "daily" if args.push else freq
+    msg_cards = decide_message_cards(cards, selection_freq, cap)
     today_bucket = freq if freq != "daily" else "daily"
     last = load_last_push()
     already_today = (last.get("date") == date.today().isoformat()
                      and last.get("freq") == freq and last.get("bucket") == today_bucket)
 
-    if not msg_cards:
+    if not effective_push:
+        print("ℹ️ 推送已禁用（push_enabled=false 或 --no-push），跳过消息发送；仅同步多维表数据。")
+        msg_cards = []
+    elif not msg_cards:
         print("ℹ️ 依频率配置，今日无需推送消息；仅同步多维表数据。")
-    elif already_today and not args.dry_run:
+    elif already_today and not args.dry_run and not args.push:
         print("ℹ️ 今日该频率已推送过，跳过消息（多维表仍更新）。")
         msg_cards = []
     else:

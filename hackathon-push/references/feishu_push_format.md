@@ -76,7 +76,13 @@ python scripts/push_feishu.py --json cards.json --sync-bitable
 
 # 设置推送频率（首次/变更时）
 python scripts/push_feishu.py --set-frequency daily   # weekly_fri / manual
+
+# 临时覆盖推送开关（无视 config.push_enabled）
+python scripts/push_feishu.py --json cards.json --update-json --push     # 强制发（忽略频率闸门）
+python scripts/push_feishu.py --json cards.json --update-json --no-push  # 只更新库/多维表
 ```
+
+> **推送飞书是可选项**：`push_enabled` 默认 `true`（配好 chat_id 即按频率推送）；改成 `false` 则只更新多维表、绝不发消息。每次运行还可用 `--push` / `--no-push` 临时覆盖。优先级：`--no-push` > `--push` > `push_enabled`。多维表同步不受此开关影响，始终更新。
 
 > **不要直接拼接 `lark-cli` 命令发送**——会绕过脚本的频率闸门、去重回写与多维表同步。chat_id 通过 `--chat-id`、`FEISHU_CHAT_ID` 或状态目录 `config.json` 提供，源码与文档不再写死。
 

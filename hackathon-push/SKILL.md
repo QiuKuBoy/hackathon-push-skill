@@ -43,7 +43,9 @@ python scripts/push_feishu.py --set-frequency daily      # 或 weekly_fri / manu
 - 让用户选一种方式配置：命令行 `--chat-id`、环境变量 `FEISHU_CHAT_ID`、或状态目录 `config.json` 写入 `{"chat_id":"oc_xxxx"}`；
 - 用 `python scripts/push_feishu.py --show-config` 确认已生效。
 
-频率与 chat_id 存于 `config.json`，后续脚本自动据此决定是否发消息（多维表始终更新，不受频率限制）。
+**推送开关（push_enabled，默认开启）：** 飞书消息推送是**可选项**，由 `config.push_enabled` 控制（默认 `true`）。用户可随时改成 `false` 让技能只更新多维表/数据库、绝不发消息；也可在每次运行时用 `--push` / `--no-push` 临时覆盖（见第四步）。多维表同步**不受此开关影响**，始终更新。
+
+频率、chat_id 与 push_enabled 存于 `config.json`，后续脚本自动据此决定是否发消息（多维表始终更新，不受频率/开关限制）。
 
 ## 第一步：高价值信源搜索
 
@@ -104,8 +106,17 @@ python scripts/push_feishu.py --json cards.json --update-json
 
 # 3) 仅同步多维表 / 本地 CSV（不发消息）
 python scripts/push_feishu.py --json cards.json --sync-bitable
+
+# 4) 临时覆盖推送开关（无视 config.push_enabled）
+python scripts/push_feishu.py --json cards.json --update-json --push     # 强制发
+python scripts/push_feishu.py --json cards.json --update-json --no-push  # 只更新库/多维表
 ```
 
+- **推送飞书是可选动作**，由 `push_enabled`（默认 `true`）与 `--push`/`--no-push` 共同决定：
+  - `push_enabled=true`（默认）且未传 `--no-push` → 按 `push_frequency` 闸门发消息；
+  - `push_enabled=false` → 绝不发消息，只更新多维表（除非本次显式 `--push`）；
+  - `--no-push` → 本次只更新库/多维表，绝不发消息（优先级最高）；
+  - `--push` → 本次强制发消息，并忽略 `manual` 频率闸门（手动「现在就推一份摘要」用）。
 - 消息是否发送、发送哪档，由 `push_frequency` 自动决定（见第 0 步）；多维表格**每次都更新**。
 - 禁止用 `--text` 做常态化推送（`--text` 仅用于临时草稿预览，且不会写去重）。
 - 单日消息最多 `daily_cap` 条（默认 12，可在 config 改）。
@@ -114,7 +125,8 @@ python scripts/push_feishu.py --json cards.json --sync-bitable
 
 1. `chat_id`：飞书群 ID。
 2. `push_frequency`：daily / weekly_fri / manual（用 `--set-frequency` 写入）。
-3. `bitable_app_token` + `bitable_table_id`：飞书多维表格（可选，见下）。
+3. `push_enabled`：飞书消息推送总开关（默认 `true`；设 `false` 则只更新库/多维表、不发消息）。
+4. `bitable_app_token` + `bitable_table_id`：飞书多维表格（可选，见下）。
 4. `daily_cap`：单日消息上限（可选，默认 12）。
 5. 开放 API 回退：`FEISHU_APP_ID` / `FEISHU_APP_SECRET`（lark-cli 不可用时需要）。
 

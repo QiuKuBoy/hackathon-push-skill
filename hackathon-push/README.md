@@ -42,6 +42,7 @@ cp -r hackathon-push <agent-skills-dir>/
 |------|------|------|
 | `chat_id` | 是 | 飞书群 ID（也可用 `--chat-id` 或环境变量 `FEISHU_CHAT_ID`） |
 | `push_frequency` | 否 | `daily` / `weekly_fri` / `manual`，默认 `daily`；也可用 `--set-frequency` 写入 |
+| `push_enabled` | 否 | 飞书消息推送总开关，**默认 `true`**；设 `false` 则只更新库/多维表、绝不发消息 |
 | `bitable_app_token` | 否 | 飞书多维表格底座 app_token（URL 中 `/base/xxx` 的 xxx） |
 | `bitable_table_id` | 否 | 多维表格内的数据表 table_id（`tblxxxx`） |
 | `daily_cap` | 否 | 单日消息最多推送几条赛事，默认 12 |
@@ -66,9 +67,13 @@ cp -r hackathon-push <agent-skills-dir>/
 python scripts/push_feishu.py --dry-run --json cards.json   # 预览
 python scripts/push_feishu.py --json cards.json --update-json   # 推送+去重+同步多维表
 python scripts/push_feishu.py --json cards.json --sync-bitable   # 仅同步多维表/CSV
+python scripts/push_feishu.py --json cards.json --update-json --push    # 强制发（忽略频率闸门）
+python scripts/push_feishu.py --json cards.json --update-json --no-push  # 只更新库/多维表
 python scripts/push_feishu.py --set-frequency weekly_fri   # 设置频率
 python scripts/push_feishu.py --show-config   # 查看配置
 ```
+
+> **推送飞书是可选项**：`push_enabled` 默认 `true`（配好 chat_id 即按频率推送）；改成 `false` 则只更新多维表、绝不发消息。每次运行可用 `--push` / `--no-push` 临时覆盖（优先级 `--no-push` > `--push` > `push_enabled`）。多维表同步不受此开关影响。
 
 `cards.json` 字段见 `examples/cards.example.json`。
 
