@@ -26,10 +26,10 @@ agent_created: true
 
 **搜索策略：**
 
-- 使用 `WebSearch` 工具；每次查询拼接当前年份（如 `2026 黑客松 报名 截止`）与「最近一个月 / 近期」等表述以筛选新赛事。
-- 使用 `WebFetch` 抓取赛事详情页，补全报名截止、奖金、链接等字段。
+- 使用 Agent 提供的联网搜索能力；每次查询拼接当前年份（如 `2026 黑客松 报名 截止`）与「最近一个月 / 近期」等表述以筛选新赛事。
+- 使用网页抓取能力读取赛事详情页，补全报名截止、奖金、链接等字段。
 - 企鹅号 / 搜狗微信搜索结果通常含最完整的国内赛事情报，优先抓取。
-- 对国内可能超时的站点（DoraHacks、天池），优先用 `WebSearch` 而非直接 `WebFetch`。
+- 对国内可能超时的站点（DoraHacks、天池），优先用搜索摘要而非直接抓取详情页。
 
 ## 第二步：去重检查
 
@@ -94,7 +94,10 @@ python scripts/push_feishu.py --json cards.json --update-json
 
 1. 命令行 `--chat-id oc_xxxx`
 2. 环境变量 `FEISHU_CHAT_ID=oc_xxxx`
-3. 运行时配置文件 `~/.workbuddy/hackathon-push/config.json` 写入 `{"chat_id": "oc_xxxx"}`
+3. 运行时配置文件 `config.json`（位于状态目录）写入 `{"chat_id": "oc_xxxx"}`
+
+**状态目录**（存放 config.json 与去重记录，agent 无关，自动解析）：
+- 环境变量 `HACKATHON_PUSH_STATE_DIR` 指定 → 否则默认技能包内 `data/` 目录。
 
 **推送实现说明：**
 
@@ -107,7 +110,7 @@ python scripts/push_feishu.py --json cards.json --update-json
 
 ## 第五步：更新去重记录
 
-推送完成后，将本轮实际推送的赛事以 `{id, name, pushed_at}` 追加写入**运行时状态文件** `~/.workbuddy/hackathon-push/pushed_hackathons.json`（不在技能目录内，避免污染仓库/重复导入丢失），同 id 去重合并（不重复写）。
+推送完成后，将本轮实际推送的赛事以 `{id, name, pushed_at}` 追加写入**运行时状态文件** `pushed_hackathons.json`（位于状态目录，默认技能包内 `data/`，可经 `HACKATHON_PUSH_STATE_DIR` 覆盖），同 id 去重合并（不重复写）。
 
 - 用脚本 `--json cards.json --update-json` 模式时，脚本会自动写回。
 - 若直接 `--text` 推送，可在推送后由模型用脚本的 `save_pushed` 逻辑补写，或下次改用 `--json` 模式以自动维护去重。
@@ -118,9 +121,9 @@ python scripts/push_feishu.py --json cards.json --update-json
 - `references/sources.md` — 各信源 URL 清单与抓取优先级、搜索 query 模板
 - `scripts/push_feishu.py` — 飞书推送脚本（lark-cli 优先，开放 API 回退，支持分条）
 
-## 定时巡查（自动化）
+## 定时巡查（可选）
 
-要周期性运行，在 WorkBuddy 创建一个 automation，提示词写：「运行 hackathon-push 技能，执行今日赛事巡查并推送飞书。」建议：每天一次（覆盖 ≤15 天即时推送）+ 每周五一次（覆盖 15~30 天观察列表）。
+要周期性自动运行，可在所用 Agent 的定时任务 / 自动化功能里创建计划，提示词写：「运行 hackathon-push 技能，执行今日赛事巡查并推送飞书。」建议：每天一次（覆盖 ≤15 天即时推送）+ 每周五一次（覆盖 15~30 天观察列表）。
 
 ## 快速启动口令
 

@@ -1,6 +1,7 @@
 # 运行时状态（含用户隐私 chat_id / 去重记录），不进仓库
 config.json
 pushed_hackathons.json
+data/
 
 # 环境变量 / 密钥
 .env

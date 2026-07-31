@@ -6,8 +6,12 @@ push_feishu.py — 飞书赛事推送脚本（无第三方依赖）
   2. 若 lark-cli 不可用，回退到飞书开放 API（需环境变量 FEISHU_APP_ID / FEISHU_APP_SECRET）
 
 配置（优先级：命令行 --chat-id > 环境变量 FEISHU_CHAT_ID > 运行时 config.json）：
-  - 飞书群 chat_id：命令行 --chat-id、环境变量 FEISHU_CHAT_ID，或 ~/.workbuddy/hackathon-push/config.json
+  - 飞书群 chat_id：命令行 --chat-id、环境变量 FEISHU_CHAT_ID，或状态目录下的 config.json
   - 开放 API 凭证：环境变量 FEISHU_APP_ID / FEISHU_APP_SECRET（lark-cli 不可用时需要）
+
+状态目录（存放 config.json 与去重记录，agent 无关）：
+  1. 环境变量 HACKATHON_PUSH_STATE_DIR（若设置）
+  2. 默认：脚本所在技能包的 data/ 子目录（任意 agent / 系统通用）
 
 依赖：仅 Python 标准库（urllib），无需 pip install。
 
@@ -36,7 +40,17 @@ from urllib import request as urllib_request
 from urllib.error import URLError, HTTPError
 
 LARK_CLI = "lark-cli"
-STATE_DIR = os.path.join(os.path.expanduser("~"), ".workbuddy", "hackathon-push")
+
+
+def resolve_state_dir() -> str:
+    """状态目录：环境变量 HACKATHON_PUSH_STATE_DIR > 默认技能包内 data/。"""
+    env = os.environ.get("HACKATHON_PUSH_STATE_DIR")
+    if env:
+        return env
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
+
+
+STATE_DIR = resolve_state_dir()
 CONFIG_PATH = os.path.join(STATE_DIR, "config.json")
 PUSHED_JSON = os.path.join(STATE_DIR, "pushed_hackathons.json")
 

@@ -2,7 +2,7 @@
 
 自动巡查中国及可参加的国际 **AI 黑客松 / 开发者赛事**，整理成结构化情报并推送到 **飞书群**。支持多信源搜索、去重、分类推送（紧急即时 / 周五汇总 / 长期观察）、状态持久化。
 
-> 这是一个 [WorkBuddy](https://www.codebuddy.cn) Skill。
+> 这是一个通用 Agent Skill，可在任意支持 SKILL.md 规范的 AI Agent 中使用。
 
 ## 它能做什么
 
@@ -19,12 +19,12 @@
 
 **方式一：导入 `.skill` 包**
 1. 从 [Releases](../../releases) 下载 `hackathon-push.skill`。
-2. 在 WorkBuddy 中导入该技能文件即可。
+2. 在所用 Agent 的技能管理界面导入该技能文件即可（兼容 SKILL.md 规范的 Agent 均可）。
 
 **方式二：放源码到 skills 目录**
 ```bash
-# 把本仓库的 hackathon-push/ 目录放到用户级技能目录
-cp -r hackathon-push ~/.workbuddy/skills/
+# 把本仓库的 hackathon-push/ 目录放到所用 Agent 的用户级技能目录
+cp -r hackathon-push <agent-skills-dir>/
 ```
 
 ## 配置
@@ -33,10 +33,13 @@ cp -r hackathon-push ~/.workbuddy/skills/
 
 1. 命令行参数：`--chat-id oc_xxxx`
 2. 环境变量：`export FEISHU_CHAT_ID=oc_xxxx`
-3. 配置文件：`~/.workbuddy/hackathon-push/config.json` 写入
+3. 配置文件：状态目录下 `config.json` 写入
    ```json
    {"chat_id": "oc_xxxx"}
    ```
+
+**状态目录**（存放 config.json 与去重记录，agent 无关，自动解析）：
+- 环境变量 `HACKATHON_PUSH_STATE_DIR` 指定 → 否则默认技能包内 `data/` 目录。
 
 **获取 chat_id**：在飞书客户端打开目标群 → 群设置 → 群机器人/群 ID，或通过飞书开放平台 API 查询。
 
@@ -47,13 +50,11 @@ export FEISHU_APP_SECRET=xxxx
 ```
 并给应用开通 `im:message`、`im:message:send_as_bot` 权限，且机器人已加入目标群。
 
-> 状态文件（去重记录、配置）默认存放在 `~/.workbuddy/hackathon-push/`，**不会污染技能目录 / 仓库**。
-
 ## 使用
 
-技能会在你说以下任一口令时触发：「搜一下最近的黑客松」「帮我找 AI 比赛」「推送赛事到飞书」「今日赛事巡查」……
+技能会在用户说以下任一口令时触发：「搜一下最近的黑客松」「帮我找 AI 比赛」「推送赛事到飞书」「今日赛事巡查」……
 
-也可建一个 WorkBuddy 自动化（每天 + 每周五）周期性巡查。提示词示例：
+也可在所用 Agent 的定时任务 / 自动化功能里建一个周期计划（每天 + 每周五）自动巡查。提示词示例：
 > 运行 hackathon-push 技能，执行今日赛事巡查并推送飞书。
 
 手动预览 / 发送（脚本式，推荐）：

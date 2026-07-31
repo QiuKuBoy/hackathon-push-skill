@@ -53,7 +53,7 @@ python scripts/push_feishu.py --text "🏁 黑客松情报 · ..."
 python scripts/push_feishu.py --json cards.json --update-json
 ```
 
-> 不要直接拼接 `lark-cli` 命令发送——会绕过脚本的去重回写与分条逻辑。chat_id 通过命令行 `--chat-id`、`FEISHU_CHAT_ID` 环境变量或 `~/.workbuddy/hackathon-push/config.json` 提供，源码与文档中不再写死。
+> 不要直接拼接 `lark-cli` 命令发送——会绕过脚本的去重回写与分条逻辑。chat_id 通过命令行 `--chat-id`、`FEISHU_CHAT_ID` 环境变量或状态目录下的 `config.json` 提供，源码与文档中不再写死。
 
 ## 飞书消息限制与分条
 
