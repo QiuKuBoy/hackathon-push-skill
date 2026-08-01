@@ -1,33 +1,33 @@
-# hackathon-push · 黑客松情报员（高价值版）
+# hackathon-push-skill · 黑客松情报员
 
-> 通用 AI Agent Skill，可在任意支持 `SKILL.md` 规范的智能体中使用（与具体 Agent / 平台无关）。
-> 面向 **AI 黑客松参赛者**，从**互联网大厂、金融、政府/学会机构**等高含金量信源巡查赛事情报，整理为结构化卡片，推送到 **飞书群**，并同步进 **飞书多维表格**（可筛选/排序的赛事库）。
+> 通用 AI Agent Skill，可在任意支持 `SKILL.md` 规范的智能体中使用，与具体 Agent / 平台无关。
+> 面向 AI 黑客松参赛者，从互联网大厂、金融、政府/学会机构等高含金量信源巡查赛事情报，整理为结构化卡片，推送到飞书群，并同步进飞书多维表格（可筛选/排序的赛事库）。
 
-[English](#english) · [安装](#安装) · [配置](#配置) · [使用](#使用) · [隐私](#隐私与安全)
+[English](#english) · [安装](#安装) · [配置](#配置) · [使用](#使用) · [隐私与安全](#隐私与安全)
 
 ---
 
 ## 它能做什么
 
 - **高价值信源巡查**：阿里天池、飞桨、Biendata、DataFountain、和鲸、讯飞、微信/企鹅号，以及大厂开发者社区、WAIC / 中国人工智能学会 / 教育部赛事、银行券商金融科技赛、MLH / Devpost / Kaggle 等国际平台（详见 `references/sources.md`）。
-- **截止日校验**：每条赛事强制回官方页确认报名截止日，避免抽错导致误判 / 去重失效。
+- **截止日校验**：每条赛事强制回官方页确认报名截止日，避免抽错导致误判或去重失效。
 - **来源分类**：每条赛事标注 `大厂 / 金融 / 政府·学会 / 国际 / 其他`，便于筛选。
 - **可交互的推送频率**：首次使用询问「每天 / 每周五 / 仅手动」，存配置后脚本自动按频率闸门决定发消息。
 - **飞书多维表格**：每次同步进 Bitable（可筛选排序）；未配置 Bitable 时生成本地 `hackathons.csv` 兜底。
 - **智能去重**：基于 `md5(赛事名|截止日期)` 记录已推送赛事，避免重复骚扰。
-- **推送可开关**：飞书消息推送是**可选项**，可手动触发或交给定时任务，也可只维护赛事库而不推送。
+- **推送可开关**：飞书消息推送为可选项，可手动触发或交给定时任务，也可只维护赛事库而不推送。
 
 ## 安装
 
-**方式一：导入 `.skill` 包（推荐普通用户）**
-1. 前往本仓库的 [Releases](../../releases) 下载 `hackathon-push.skill`。
+**方式一：导入 `.skill` 包（推荐）**
+1. 前往本仓库 [Releases](../../releases) 下载 `hackathon-push-skill.skill`。
 2. 在所用 Agent 的技能管理界面导入即可。
 
-**方式二：源码安装（开发者 / 想改配置）**
+**方式二：源码安装**
 ```bash
-# 克隆后，把 hackathon-push/ 放进所用 Agent 的 skills 目录
+# 克隆后，把整个仓库目录（即技能根，含 SKILL.md）放进所用 Agent 的 skills 目录
 git clone https://github.com/<your-name>/hackathon-push-skill.git
-cp -r hackathon-push-skill/hackathon-push <agent-skills-dir>/
+cp -r hackathon-push-skill <agent-skills-dir>/
 ```
 
 ## 配置
@@ -49,12 +49,12 @@ cp -r hackathon-push-skill/hackathon-push <agent-skills-dir>/
 |------|------|------|
 | `chat_id` | 是* | 飞书群 ID（也可用 `--chat-id` 或环境变量 `FEISHU_CHAT_ID`）。*仅当要推送飞书消息时需要 |
 | `push_frequency` | 否 | `daily` / `weekly_fri` / `manual`，默认 `daily`；也可用 `--set-frequency` 写入 |
-| `push_enabled` | 否 | 飞书消息推送总开关，**默认 `true`**；设 `false` 则只更新库 / 多维表、绝不发消息 |
+| `push_enabled` | 否 | 飞书消息推送总开关，默认 `true`；设 `false` 则只更新库 / 多维表、绝不发消息 |
 | `bitable_app_token` | 否 | 飞书多维表格底座 app_token（URL 中 `/base/xxx` 的 xxx） |
 | `bitable_table_id` | 否 | 多维表格内的数据表 table_id（`tblxxxx`） |
 | `daily_cap` | 否 | 单日消息最多推送几条赛事，默认 12 |
 
-> **获取 chat_id**：飞书客户端打开目标群 → 群设置 → 群机器人 / 群 ID，或通过开放平台 API 查询。
+**获取 chat_id**：飞书客户端打开目标群 → 群设置 → 群机器人 / 群 ID，或通过开放平台 API 查询。
 
 **飞书开放 API 回退（可选）**：若环境无 `lark-cli`，脚本回退开放 API，需自建应用并配置环境变量 `FEISHU_APP_ID` / `FEISHU_APP_SECRET`，开通 `im:message`、`im:message:send_as_bot`，且机器人已入群。
 
@@ -64,7 +64,7 @@ cp -r hackathon-push-skill/hackathon-push <agent-skills-dir>/
 
 触发口令：「搜一下最近的黑客松」「帮我找 AI 比赛」「推送赛事到飞书」「生成赛事多维表」……
 
-首次运行若未设 `push_frequency`，技能会**询问你推送频率**后再工作。
+首次运行若未设 `push_frequency`，技能会先询问推送频率再工作。
 
 推荐在所用 Agent 的定时任务里建一个**每日**计划（频率由 config 决定，脚本内部处理「今天推不推」）。提示词示例：
 > 运行 hackathon-push 技能：搜索高价值 AI 黑客松 → 校验截止日 → 生成 cards.json → `python scripts/push_feishu.py --json cards.json --update-json`（先 --dry-run 确认）。若 config 无 push_frequency，先问我推送频率。
@@ -80,14 +80,14 @@ python scripts/push_feishu.py --set-frequency weekly_fri                 # 设�
 python scripts/push_feishu.py --show-config                             # 查看配置
 ```
 
-> **推送飞书是可选项**：`push_enabled` 默认 `true`（配好 chat_id 即按频率推送）；改成 `false` 则只更新多维表、绝不发消息。每次运行可用 `--push` / `--no-push` 临时覆盖（优先级 `--no-push` > `--push` > `push_enabled`）。多维表同步不受此开关影响。
+推送飞书为可选项：`push_enabled` 默认 `true`（配好 chat_id 即按频率推送）；设为 `false` 则只更新多维表、绝不发消息。每次运行可用 `--push` / `--no-push` 临时覆盖（优先级 `--no-push` > `--push` > `push_enabled`）。多维表同步不受此开关影响。
 
 `cards.json` 字段见 `examples/cards.example.json`。
 
 ## 目录结构
 
 ```
-hackathon-push/
+hackathon-push-skill/
 ├── SKILL.md                      # 技能定义（工作流、触发词、频率交互）
 ├── README.md
 ├── LICENSE
@@ -104,10 +104,10 @@ hackathon-push/
 
 ## 隐私与安全
 
-- **本仓库不包含任何个人飞书凭据**：所有 `chat_id` / `app_id` / `app_secret` 均为占位符或运行时从环境变量 / 本地 `config.json` 读取。
-- **状态文件全部本地**：去重记录、`config.json` 位于状态目录（默认 `data/`），已被 `.gitignore` 忽略，**不会进入 git / GitHub**。
-- **分发包走 Releases**：`hackathon-push.skill` 为打包产物，不纳入版本控制（见 `.gitignore`），请从仓库 [Releases](../../releases) 下载。
-- **仅标准库依赖**：`push_feishu.py` 只使用 Python 标准库（`urllib`），无需 `pip install`。
+- 本仓库不包含任何个人飞书凭据：所有 `chat_id` / `app_id` / `app_secret` 均为占位符或运行时从环境变量 / 本地 `config.json` 读取。
+- 状态文件全部本地：去重记录、`config.json` 位于状态目录（默认 `data/`），已被 `.gitignore` 忽略，不会进入 git / GitHub。
+- 分发包走 Releases：`hackathon-push-skill.skill` 为打包产物，不纳入版本控制（见 `.gitignore`），请从仓库 [Releases](../../releases) 下载。
+- 仅标准库依赖：`push_feishu.py` 只使用 Python 标准库（`urllib`），无需 `pip install`。
 
 ## 常见问题
 
@@ -124,9 +124,9 @@ hackathon-push/
 
 ## English
 
-**hackathon-push** is an AI-Agent skill (framework-agnostic, works with any agent that supports the `SKILL.md` convention). It scans **high-value AI hackathon sources** — big-tech developer platforms, finance, government / academic societies, and international platforms — curates structured contest cards, pushes them to a **Feishu** group, and syncs them into a **Feishu Bitable** (a filterable / sortable contest database).
+**hackathon-push-skill** is an AI-Agent skill (framework-agnostic, works with any agent that supports the `SKILL.md` convention). It scans high-value AI hackathon sources — big-tech developer platforms, finance, government / academic societies, and international platforms — curates structured contest cards, pushes them to a Feishu group, and syncs them into a Feishu Bitable (a filterable / sortable contest database).
 
-- Install: import `hackathon-push.skill` (from Releases) into your agent, or copy the `hackathon-push/` folder into your agent's skills directory.
+- Install: import `hackathon-push-skill.skill` (from Releases) into your agent, or copy this repository folder (the skill root, containing `SKILL.md`) into your agent's skills directory.
 - Configure: a local `config.json` in the state dir holds `chat_id`, `push_frequency`, optional `bitable_app_token` / `bitable_table_id`. No secrets are hardcoded.
 - Push is optional: `push_enabled` (default `true`) gates Feishu messages; `--push` / `--no-push` override per run. The Bitable / CSV database always stays up to date.
 - Zero dependencies: pure Python standard library.

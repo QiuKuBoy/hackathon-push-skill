@@ -1,10 +1,19 @@
-# 分发包走 GitHub Releases，不进 git 仓库
+# 分发包走 GitHub Releases，不进仓库
 *.skill
 *.zip
 
-# 运行时配置与状态（含 chat_id 等隐私，位于 hackathon-push/ 内）
+# 运行时配置与状态（含用户隐私 chat_id / 去重记录）
 config.json
+pushed_hackathons.json
 data/
+
+# 环境变量 / 密钥
+.env
+*.env
+
+# Python 缓存
+__pycache__/
+*.pyc
 
 # 系统文件
 .DS_Store
