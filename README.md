@@ -19,14 +19,9 @@
 
 ## 安装
 
-**方式一：导入 `.skill` 包（推荐）**
-1. 前往本仓库 [Releases](../../releases) 下载 `hackathon-push-skill.skill`。
-2. 在所用 Agent 的技能管理界面导入即可。
-
-**方式二：源码安装**
 ```bash
 # 克隆后，把整个仓库目录（即技能根，含 SKILL.md）放进所用 Agent 的 skills 目录
-git clone https://github.com/<your-name>/hackathon-push-skill.git
+git clone https://github.com/QiuKuBoy/hackathon-push-skill.git
 cp -r hackathon-push-skill <agent-skills-dir>/
 ```
 
@@ -103,7 +98,7 @@ hackathon-push-skill/
 
 - 本仓库不包含任何个人飞书凭据：所有 `chat_id` / `app_id` / `app_secret` 均为占位符或运行时从环境变量 / 本地 `config.json` 读取。
 - 状态文件全部本地：去重记录、`config.json` 位于状态目录（默认 `data/`），已被 `.gitignore` 忽略，不会进入 git / GitHub。
-- 分发包走 Releases：`hackathon-push-skill.skill` 为打包产物，不纳入版本控制（见 `.gitignore`），请从仓库 [Releases](../../releases) 下载。
+- 本仓库仅发布源码：`hackathon-push-skill.skill` 为本地打包产物，不纳入版本控制（见 `.gitignore`），仅供本地一键导入；GitHub 上请直接 clone 本仓库使用。
 - 仅标准库依赖：`push_feishu.py` 只使用 Python 标准库（`urllib`），无需 `pip install`。
 
 ## 常见问题
@@ -123,7 +118,7 @@ hackathon-push-skill/
 
 **hackathon-push-skill** is an AI-Agent skill (framework-agnostic, works with any agent that supports the `SKILL.md` convention). It scans high-value AI hackathon sources — big-tech developer platforms, finance, government / academic societies, and international platforms — curates structured contest cards, pushes them to a Feishu group, and syncs them into a Feishu Bitable (a filterable / sortable contest database).
 
-- Install: import `hackathon-push-skill.skill` (from Releases) into your agent, or copy this repository folder (the skill root, containing `SKILL.md`) into your agent's skills directory.
+- Install: copy this repository folder (the skill root, containing `SKILL.md`) into your agent's skills directory.
 - Configure: a local `config.json` in the state dir holds `chat_id`, `push_frequency`, optional `bitable_app_token` / `bitable_table_id`. No secrets are hardcoded.
 - Push is optional: `push_enabled` (default `true`) gates Feishu messages; `--push` / `--no-push` override per run. The Bitable / CSV database always stays up to date.
 - Zero dependencies: pure Python standard library.
