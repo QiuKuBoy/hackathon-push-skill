@@ -2,6 +2,9 @@
 *.skill
 *.zip
 
+# 本地样例模板（保留在本地，不进仓库）
+examples/
+
 # 运行时配置与状态（含用户隐私 chat_id / 去重记录）
 config.json
 pushed_hackathons.json

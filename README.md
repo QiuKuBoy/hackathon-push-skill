@@ -82,7 +82,7 @@ python scripts/push_feishu.py --show-config                             # 查看
 
 推送飞书为可选项：`push_enabled` 默认 `true`（配好 chat_id 即按频率推送）；设为 `false` 则只更新多维表、绝不发消息。每次运行可用 `--push` / `--no-push` 临时覆盖（优先级 `--no-push` > `--push` > `push_enabled`）。多维表同步不受此开关影响。
 
-`cards.json` 字段见 `examples/cards.example.json`。
+`cards.json` 字段与 `category` 取值见 SKILL.md「第三步：生成情报卡片」代码块。
 
 ## 目录结构
 
@@ -94,12 +94,9 @@ hackathon-push-skill/
 ├── .gitignore
 ├── scripts/
 │   └── push_feishu.py            # 推送+多维表脚本（仅标准库，lark-cli 优先 / API 回退 / 频率闸门 / 去重 / CSV）
-├── references/
-│   ├── sources.md                # 高价值信源清单（大厂 / 金融 / 政府 / 国际）
-│   └── feishu_push_format.md     # 卡片模板、多维表格字段 schema
-└── examples/
-    ├── cards.example.json
-    └── pushed_hackathons.example.json
+└── references/
+    ├── sources.md                # 高价值信源清单（大厂 / 金融 / 政府 / 国际）
+    └── feishu_push_format.md     # 卡片模板、多维表格字段 schema
 ```
 
 ## 隐私与安全
@@ -131,7 +128,7 @@ hackathon-push-skill/
 - Push is optional: `push_enabled` (default `true`) gates Feishu messages; `--push` / `--no-push` override per run. The Bitable / CSV database always stays up to date.
 - Zero dependencies: pure Python standard library.
 
-See `references/sources.md` for the source list and `examples/` for card schema.
+See `references/sources.md` for the source list and `references/feishu_push_format.md` for the card schema.
 
 ## Contributing
 
